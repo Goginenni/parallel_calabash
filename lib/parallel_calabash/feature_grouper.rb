@@ -35,7 +35,7 @@ module ParallelCalabash
             group << files.delete_at(0)
           end
         end
-        groups
+        groups.reject &:empty?
       end
 
       def scenario_groups group_size, options
@@ -47,7 +47,7 @@ module ParallelCalabash
       end
 
       def generate_dry_run_report options
-        `cucumber #{options[:cucumber_options]}  -f usage --dry-run -f json --out parallel_calabash_dry_run.json #{options[:feature_folder].first}`
+        `cucumber #{options[:cucumber_options]}  -f usage --dry-run -f json --out parallel_calabash_dry_run.json #{options[:feature_folder].join(' ')}`
       end
 
       def feature_files_in_folder(feature_dir)
