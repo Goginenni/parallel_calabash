@@ -6,7 +6,7 @@ module ParallelCalabash
       end
 
       def run_tests(test_files, process_number, options)
-        cmd = [base_command, options[:apk_path], options[:cucumber_options], *test_files].compact*' '
+        cmd = [base_command, options[:apk_path], options[:cucumber_options], options[:cucumber_reports], *test_files].compact*' '
         execute_command_for_process(process_number, cmd, options[:mute_output])
       end
 

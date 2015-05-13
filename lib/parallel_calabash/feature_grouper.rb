@@ -42,12 +42,12 @@ module ParallelCalabash
         generate_dry_run_report options
         raise "Can not create dry run for scenario distribution" unless File.exists?("parallel_calabash_dry_run.json")
         distribution_data = JSON.parse(File.read("parallel_calabash_dry_run.json"))
-        all_runnable_scenarios = distribution_data.map { |feature| feature["elements"].map { |scenario| "#{feature["uri"]}:#{scenario["line"]}" } }.flatten
+        all_runnable_scenarios = distribution_data.map { |feature| feature["elements"]!=nil && feature["elements"].map { |scenario| "#{feature["uri"]}:#{scenario["line"]}" } }.flatten
         groups = group_creator group_size,all_runnable_scenarios
       end
 
       def generate_dry_run_report options
-        `cucumber #{options[:cucumber_options]}  -f usage --dry-run -f json --out parallel_calabash_dry_run.json #{options[:feature_folder].join(' ')}`
+        `cucumber #{options[:cucumber_options]} --dry-run -f json --out parallel_calabash_dry_run.json #{options[:feature_folder].join(' ')}`
       end
 
       def feature_files_in_folder(feature_dir)
