@@ -42,7 +42,7 @@ module ParallelCalabash
         generate_dry_run_report options
         raise "Can not create dry run for scenario distribution" unless File.exists?("parallel_calabash_dry_run.json")
         distribution_data = JSON.parse(File.read("parallel_calabash_dry_run.json"))
-        all_runnable_scenarios = distribution_data.map { |feature| feature["elements"]!=nil && feature["elements"].map { |scenario| "#{feature["uri"]}:#{scenario["line"]}" } }.flatten
+        all_runnable_scenarios = distribution_data.map { |feature| feature["elements"].map { |scenario| "#{feature["uri"]}:#{scenario["line"]}" } unless feature["elements"].nil?  }.flatten.compact
         groups = group_creator group_size,all_runnable_scenarios
       end
 
