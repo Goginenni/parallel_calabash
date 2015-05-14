@@ -26,7 +26,7 @@ module ParallelCalabash
       def command_for_process process_number, cmd
         env = {}
         device_id, device_info = ParallelCalabash::AdbHelper.device_for_process process_number
-        env = env.merge({'AUTOTEST' => '1', 'ADB_DEVICE_ARG' => device_id, 'DEVICE_INFO' => device_info, "TEST_PROCESS_NUMBER" => (process_number+1).to_s})
+        env = env.merge({'AUTOTEST' => '1', 'ADB_DEVICE_ARG' => device_id, 'DEVICE_INFO' => device_info, "TEST_PROCESS_NUMBER" => (process_number+1).to_s, 'SCREENSHOT_PATH' => device_id.to_s + '_'})
         separator = (WINDOWS ? ' & ' : ';')
         exports = env.map { |k, v| WINDOWS ? "(SET \"#{k}=#{v}\")" : "#{k}=#{v};export #{k}" }.join(separator)
         exports + separator + cmd
