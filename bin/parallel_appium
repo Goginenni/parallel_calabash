@@ -1,15 +1,15 @@
 #!/usr/bin/env ruby
 
 $LOAD_PATH << File.expand_path("../../lib", __FILE__)
-require "parallel_calabash"
-require 'parallel_calabash/version'
+require "parallel_appium"
+require 'parallel_appium/version'
 require 'optparse'
 
 def parse_arguments(arguments)
   options = {}
   opt_parser = OptionParser.new do |opts|
-    opts.banner = "Usage: parallel_calabash [options]\n" \
-                "Example: parallel_calabash -a my.apk -o '<cucumber opts>' -r '<cucumber_reports>' features/"
+    opts.banner = "Usage: parallel_appium [options]\n" \
+                "Example: parallel_appium -a my.apk -o '<cucumber opts>' -r '<cucumber_reports>' features/"
 
     opts.on("-h", "--help", "Show this message") do
       puts opts
@@ -17,12 +17,8 @@ def parse_arguments(arguments)
     end
 
     opts.on("-v", "--version", "Show version") do
-      puts ParallelCalabash::VERSION
+      puts ParallelAppium::VERSION
       exit
-    end
-
-    opts.on("-a", "--apk apk_path", "apk file path") do |apk_path|
-      options[:apk_path] = apk_path
     end
 
     opts.on("-d", "--distribution-tag tag", "divide features into groups as per occurrence of given tag") do |distribution_tag|
@@ -61,6 +57,6 @@ end
 
 options = parse_arguments(ARGV)
 
-ParallelCalabash.run_tests_in_parallel options
+ParallelAppium.run_tests_in_parallel options
 
 

@@ -1,4 +1,4 @@
-module ParallelCalabash
+module ParallelAppium
   class ResultFormatter
     class << self
 

@@ -1,5 +1,5 @@
 require 'json'
-module ParallelCalabash
+module ParallelAppium
   class FeatureGrouper
 
     class << self

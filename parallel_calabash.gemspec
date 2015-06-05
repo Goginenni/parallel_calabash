@@ -1,16 +1,16 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'parallel_calabash/version'
+require 'parallel_appium/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "parallel_calabash"
-  spec.version       = ParallelCalabash::VERSION
-  spec.authors       = ["Rajdeep"]
-  spec.email         = ["mail.rajvarma@gmail.com"]
-  spec.summary       = %q{calabash android tests in parallel}
+  spec.name          = "parallel_appium"
+  spec.version       = ParallelAppium::VERSION
+  spec.authors       = ["Sathish"]
+  spec.email         = ["sathish.gogineni@gmail.com"]
+  spec.summary       = %q{appium android tests mobile web in parallel}
   spec.description   = %q{Run different calabash android tests in parallel on different devices}
-  spec.homepage      = "https://github.com/rajdeepv/parallel_calabash"
+  spec.homepage      = "https://github.com/rajdeepv/parallel_appium"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")

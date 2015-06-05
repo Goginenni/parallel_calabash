@@ -1,4 +1,4 @@
-module ParallelCalabash
+module ParallelAppium
   module AdbHelper
     class << self
 

@@ -1,13 +1,13 @@
 require 'tempfile'
 require 'parallel'
-require 'parallel_calabash/version'
-require 'parallel_calabash/adb_helper'
-require 'parallel_calabash/runner'
-require 'parallel_calabash/feature_grouper'
-require 'parallel_calabash/result_formatter'
+require 'parallel_appium/version'
+require 'parallel_appium/adb_helper'
+require 'parallel_appium/runner'
+require 'parallel_appium/feature_grouper'
+require 'parallel_appium/result_formatter'
 require 'rbconfig'
 
-module ParallelCalabash
+module ParallelAppium
 
   WINDOWS = (RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/)
   class << self
@@ -32,6 +32,7 @@ module ParallelCalabash
         test_results = Parallel.map_with_index(groups, :in_threads => threads) do |group, index|
           Runner.run_tests(group, index, options)
         end
+        Runner.stop_all_appium
         ResultFormatter.report_results(test_results)
       end
 
