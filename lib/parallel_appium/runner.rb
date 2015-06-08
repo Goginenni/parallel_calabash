@@ -5,15 +5,16 @@ module ParallelAppium
         'cucumber'
       end
 
-      def start_appium(process_number,device_id)
+      def start_appium(process_number,device_id,appium_cmd)
 
         chrome_driver_port =  9515 + process_number + 1
         bootstrap_port = 4800 + process_number + 1
         appium_port = 4723 + process_number + 1
+        cmd = appium_cmd || 'appium'
 
-        appium_command = "./node_modules/.bin/appium --port #{appium_port} --udid #{device_id} --bootstrap-port #{bootstrap_port} --chromedriver-port #{chrome_driver_port} --session-override --log-level error --log appium_#{process_number}.log --log-no-colors &"
+        start_appium = "#{cmd} --port #{appium_port} --udid #{device_id} --bootstrap-port #{bootstrap_port} --chromedriver-port #{chrome_driver_port} --log-level error --log appium_#{process_number}.log &"
 
-        system(appium_command)
+        system(start_appium)
 
         appium_started = false
 
@@ -25,7 +26,6 @@ module ParallelAppium
         end
 
         raise 'Can not start Appium' unless appium_started
-
         appium_port
       end
 
@@ -35,16 +35,16 @@ module ParallelAppium
 
       def run_tests(test_files, process_number, options)
         cmd = [base_command, options[:cucumber_options], options[:cucumber_reports], *test_files].compact*' '
-        execute_command_for_process(process_number, cmd, options[:mute_output])
+        execute_command_for_process(process_number, cmd, options[:appium_cmd], options[:mute_output])
       end
 
-      def execute_command_for_process(process_number, cmd, silence)
+      def execute_command_for_process(process_number, cmd, appium_cmd, silence)
 
         device_id, device_info = ParallelAppium::AdbHelper.device_for_process process_number
 
-        appium_port = start_appium(process_number,device_id)
+        appium_port = start_appium(process_number,device_id,appium_cmd)
 
-        command_for_current_process = command_for_process(process_number, cmd)
+        command_for_current_process = command_for_process(process_number, cmd,device_id,device_info,appium_port)
         output = open("|#{command_for_current_process}", "r") { |output| show_output(output, silence) }
         exitstatus = $?.exitstatus
 
@@ -57,10 +57,10 @@ module ParallelAppium
 
       end
 
-      def command_for_process process_number, cmd
+      def command_for_process(process_number,cmd,device_id,device_info,appium_port)
         env = {}
 
-        env = env.merge({'AUTOTEST' => '1', 'ADB_DEVICE_ARG' => device_id, 'DEVICE_INFO' => device_info, "TEST_PROCESS_NUMBER" => (process_number+1).to_s, 'SCREENSHOT_PATH' => device_id.to_s + '_'})
+        env = env.merge({AUTOTEST:'1', ADB_DEVICE_ARG:device_id, APPIUM_PORT:appium_port, DEVICE_INFO:device_info, TEST_PROCESS_NUMBER:(process_number+1).to_s, SCREENSHOT_PATH:device_id.to_s + '_'})
         separator = (WINDOWS ? ' & ' : ';')
         exports = env.map { |k, v| WINDOWS ? "(SET \"#{k}=#{v}\")" : "#{k}=#{v};export #{k}" }.join(separator)
         exports + separator + cmd

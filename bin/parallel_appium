@@ -9,7 +9,7 @@ def parse_arguments(arguments)
   options = {}
   opt_parser = OptionParser.new do |opts|
     opts.banner = "Usage: parallel_appium [options]\n" \
-                "Example: parallel_appium -a my.apk -o '<cucumber opts>' -r '<cucumber_reports>' features/"
+                "Example: parallel_appium -a '<appium command>' -o '<cucumber opts>' -r '<cucumber_reports>' features/"
 
     opts.on("-h", "--help", "Show this message") do
       puts opts
@@ -23,6 +23,10 @@ def parse_arguments(arguments)
 
     opts.on("-d", "--distribution-tag tag", "divide features into groups as per occurrence of given tag") do |distribution_tag|
       options[:distribution_tag] = distribution_tag
+    end
+
+    opts.on("-a","--appium_cmd '[APPIUM COMMAND]'","Custom appium command with options") do |appium_cmd|
+      options[:appium_cmd] =  appium_cmd
     end
 
     opts.on("-o", "--cucumber_opts '[OPTIONS]'", "execute with those cucumber options") do |cucumber_opts|
