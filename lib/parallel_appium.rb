@@ -27,7 +27,7 @@ module ParallelAppium
       test_results = nil
       report_time_taken do
 
-        groups = FeatureGrouper.feature_groups_by_scenarios(options[:feature_folder], number_of_processes)
+        groups = FeatureGrouper.feature_groups(options, number_of_processes)
 
         threads = groups.size
 
