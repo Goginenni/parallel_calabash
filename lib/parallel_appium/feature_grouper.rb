@@ -12,7 +12,6 @@ module ParallelAppium
       end
 
       def feature_groups_by_scenarios(features_scenarios,group_size)
-        puts features_scenarios.size
         min_number_scenarios_per_group = features_scenarios.size/group_size
         remaining_number_of_scenarios = features_scenarios.size % group_size
         groups = Array.new(group_size) { [] }

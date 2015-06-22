@@ -1,6 +1,8 @@
 module ParallelAppium
   class Runner
     class << self
+      @@appium_ports = []
+
       def base_command
         'cucumber'
       end
@@ -26,11 +28,21 @@ module ParallelAppium
         end
 
         raise 'Can not start Appium' unless appium_started
+        @@appium_ports.push(appium_port)
         appium_port
       end
 
       def stop_all_appium
-        `killall node`
+        no_appium_server = @@appium_ports.size == 0
+        3.times do
+          `killall node`
+          @@appium_ports.each do |appium_port|
+            response = `curl --max-time 2 http://localhost:#{appium_port}/wd/hub/status/`
+            no_appium_server = response.empty?
+          end
+          break if no_appium_server
+        end
+        raise 'Can not stop all appium servers' unless no_appium_server
       end
 
       def run_tests(test_files, process_number, options)
