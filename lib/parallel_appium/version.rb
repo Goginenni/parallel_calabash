@@ -1,3 +1,3 @@
 module ParallelAppium
-  VERSION = "0.0.1.pre6"
+  VERSION = "0.0.1.pre7"
 end

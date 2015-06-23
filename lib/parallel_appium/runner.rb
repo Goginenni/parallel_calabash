@@ -27,13 +27,23 @@ module ParallelAppium
           sleep(0.5)
         end
 
-        raise 'Can not start Appium' unless appium_started
+        unless appium_started
+          stop_all_appium
+          abort("Can not start Appium for the port #{appium_port}" )
+        end
+
+        puts '*******************************'
+        puts " APPIUM started on port : #{appium_port}"
+        puts '*******************************'
+
         @@appium_ports.push(appium_port)
         appium_port
       end
 
       def stop_all_appium
         no_appium_server = @@appium_ports.size == 0
+        puts '******************************'
+        puts "Stopping all appium servers on ports #{@@appium_ports}"
         3.times do
           `killall node`
           @@appium_ports.each do |appium_port|
@@ -43,6 +53,7 @@ module ParallelAppium
           break if no_appium_server
         end
         raise 'Can not stop all appium servers' unless no_appium_server
+        puts '**************Stopped all APPIUM servers ****************'
       end
 
       def run_tests(test_files, process_number, options)
