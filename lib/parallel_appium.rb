@@ -45,12 +45,11 @@ module ParallelAppium
             :finish => lambda { |_, i, _|  complete.push(i); print complete, "\n" }) do |group, index|
           @runner.run_tests(group, index, @options)
         end
-        @runner.stop_all_appium
         puts 'All threads complete'
         ResultFormatter.report_results(test_results)
       end
-      @runner.prepare_for_parallel_execution
       puts 'Parallel run complete'
+      @runner.exit_parallel_execution
       Kernel.exit(1) if any_test_failed?(test_results)
     end
 

@@ -3,8 +3,9 @@
 $LOAD_PATH << File.expand_path("../../lib", __FILE__)
 
 require 'parallel_appium'
-require 'parallel_calabash/version'
+require 'parallel_appium/version'
 require 'optparse'
+require 'parallel_calabash'
 
 def parse_arguments(arguments)
   options = {}

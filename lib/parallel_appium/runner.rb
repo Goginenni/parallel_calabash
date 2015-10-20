@@ -29,7 +29,7 @@ module ParallelAppium
       end
 
       unless appium_started
-        stop_all_appium
+        stop_all_appium([appium_port])
         abort("Can not start Appium for the port #{appium_port}" )
       end
 
@@ -126,6 +126,10 @@ module ParallelAppium
       separator = (WINDOWS ? ' & ' : ';')
       exports = env.map { |k, v| WINDOWS ? "(SET \"#{k}=#{v}\")" : "#{k}=#{v};export #{k}" }.join(separator)
       exports + separator + cmd
+    end
+
+    def exit_parallel_execution
+      stop_all_appium(@@appium_ports)
     end
   end
 
