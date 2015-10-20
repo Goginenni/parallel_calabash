@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
 
 $LOAD_PATH << File.expand_path("../../lib", __FILE__)
-require "parallel_appium"
-require 'parallel_appium/version'
+
+require 'parallel_appium'
+require 'parallel_calabash/version'
 require 'optparse'
 
 def parse_arguments(arguments)
@@ -29,11 +30,19 @@ def parse_arguments(arguments)
       options[:appium_cmd] =  appium_cmd
     end
 
+    opts.on("-f", "--filter filter", "Filter devices to run tests against using partial device id or model name matching. Multiple filters seperated by ','") do |filter_opts|
+      options[:filter] = filter_opts.split(',').grep(/./)
+    end
+
+    opts.on('--skip_ios_ping_check', 'Skip the connectivity test for iOS devices') do
+      options[:skip_ios_ping_check] = true
+    end
+
     opts.on("-o", "--cucumber_opts '[OPTIONS]'", "execute with those cucumber options") do |cucumber_opts|
       options[:cucumber_options] = cucumber_opts
     end
 
-    opts.on("-r", "--cucumber_reports '[REPORTS]'", "generate these cucumber reports") do |cucumber_reports|
+    opts.on("-r", "--cucumber_reports '[REPORTS]'", "generate these cucumber reports (not during filtering)") do |cucumber_reports|
       options[:cucumber_reports] = cucumber_reports
     end
 
@@ -53,14 +62,16 @@ def parse_arguments(arguments)
 
   opt_parser.parse!(arguments)
   options[:feature_folder] = arguments
+  fail '-a apk and -p app are mutually exclusive' if options.has_key?(:apk_path) && options.has_key?(:app_path)
+  fail '-a apk or -p app is required' unless options.has_key?(:apk_path) || options.has_key?(:app_path)
   options
-rescue OptionParser::InvalidOption
-  puts "Invalid arguments "
-  puts opt_parser.help
+rescue OptionParser::InvalidOption => e
+  puts "Invalid arguments #{e}"
+  fail opt_parser.help
 end
 
 options = parse_arguments(ARGV)
 
-ParallelAppium.run_tests_in_parallel options
+ParallelAppium::ParallelCalabashApp.new(options).run_tests_in_parallel
 
 

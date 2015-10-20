@@ -12,6 +12,7 @@ module ParallelAppium
       end
 
       def feature_groups_by_scenarios(features_scenarios,group_size)
+        puts "Scenarios: #{features_scenarios.size}"
         min_number_scenarios_per_group = features_scenarios.size/group_size
         remaining_number_of_scenarios = features_scenarios.size % group_size
         groups = Array.new(group_size) { [] }
@@ -57,15 +58,20 @@ module ParallelAppium
         generate_dry_run_report options
         raise "Can not create dry run for scenario distribution" unless File.exists?("parallel_calabash_dry_run.json")
         distribution_data = JSON.parse(File.read("parallel_calabash_dry_run.json"))
+        # puts "SCENARIO GROUPS #{distribution_data}"
         all_runnable_scenarios = distribution_data.map do |feature|
           unless feature["elements"].nil?
             feature["elements"].map do |scenario|
               if scenario["keyword"] == 'Scenario'
                 "#{feature["uri"]}:#{scenario["line"]}"
               elsif scenario['keyword'] == 'Scenario Outline'
-                scenario["examples"].map { |example|
-                  "#{feature["uri"]}:#{example["line"]}"
-                }
+                if scenario["examples"]
+                  scenario["examples"].map { |example|
+                    "#{feature["uri"]}:#{example["line"]}"
+                  }
+                else
+                  "#{feature["uri"]}:#{scenario["line"]}" # Cope with --expand
+                end
               end
             end
           end
@@ -74,14 +80,23 @@ module ParallelAppium
       end
 
       def generate_dry_run_report options
-        `cucumber #{options[:cucumber_options]} --dry-run -f json --out parallel_calabash_dry_run.json #{options[:feature_folder].join(' ')}`
+        %x( cucumber #{options[:cucumber_options]} --dry-run -f json --out parallel_calabash_dry_run.json #{options[:feature_folder].join(' ')} )
       end
 
-      def feature_files_in_folder(feature_dir)
-        if File.directory?(feature_dir.first)
-          files = Dir[File.join(feature_dir, "**{,/*/**}/*")].uniq
+      def feature_files_in_folder(feature_dir_or_file)
+        if File.directory?(feature_dir_or_file.first)
+          files = Dir[File.join(feature_dir_or_file, "**{,/*/**}/*")].uniq
           files.grep(/\.feature$/)
+        elsif feature_folder_has_single_feature?(feature_dir_or_file)
+          feature_dir_or_file
+        elsif File.file?(feature_dir_or_file.first)
+          scenarios = File.open(feature_dir_or_file.first).collect{ |line| line.split(' ') }
+          scenarios.flatten
         end
+      end
+
+      def feature_folder_has_single_feature?(feature_dir)
+        feature_dir.first.include?('.feature')
       end
 
       def weight_of_feature(feature_file, weighing_factor)
