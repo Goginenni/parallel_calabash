@@ -106,7 +106,7 @@ module ParallelAppium
       appium_port = start_appium(process_number,device_id,options[:appium_cmd])
       @@appium_ports.push(appium_port)
 
-      cmd = command_for_test(base_command, options[:cucumber_options], "#{options[:cucumber_options]} #{options[:cucumber_reports]}", test_files, appium_port)
+      cmd = command_for_test(process_number,base_command, "#{options[:cucumber_options]} #{options[:cucumber_reports]}", test_files, appium_port)
       $stdout.print "#{process_number}>> Command: #{cmd}\n"
       $stdout.flush
       execute_command_for_process(process_number, cmd)
