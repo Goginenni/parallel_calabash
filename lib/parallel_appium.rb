@@ -31,7 +31,7 @@ module ParallelAppium
     end
 
     def run_tests_in_parallel
-      @runner.prepare_for_parallel_execution
+      @runner.setup_for_parallel_execution
       number_of_processes = number_of_processes_to_start
       test_results = nil
       report_time_taken do
@@ -49,7 +49,7 @@ module ParallelAppium
         ResultFormatter.report_results(test_results)
       end
       puts 'Parallel run complete'
-      @runner.exit_parallel_execution
+      @runner.teardown_parallel_execution
       Kernel.exit(1) if any_test_failed?(test_results)
     end
 

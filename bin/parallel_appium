@@ -63,8 +63,6 @@ def parse_arguments(arguments)
 
   opt_parser.parse!(arguments)
   options[:feature_folder] = arguments
-  fail '-a apk and -p app are mutually exclusive' if options.has_key?(:apk_path) && options.has_key?(:app_path)
-  fail '-a apk or -p app is required' unless options.has_key?(:apk_path) || options.has_key?(:app_path)
   options
 rescue OptionParser::InvalidOption => e
   puts "Invalid arguments #{e}"

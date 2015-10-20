@@ -17,6 +17,7 @@ module ParallelAppium
 
       start_appium = "#{cmd} --port #{appium_port} --udid #{device_id} --bootstrap-port #{bootstrap_port} --chromedriver-port #{chrome_driver_port} --log-level error --log appium_#{process_number}.log &"
 
+      $stdout.print "appium command: #{start_appium}"
       system(start_appium)
 
       appium_started = false
@@ -95,13 +96,13 @@ module ParallelAppium
       @@appium_ports = []
     end
 
-    def prepare_for_parallel_execution
+    def setup_for_parallel_execution
       # Android is fairly sane....
     end
 
 
     def run_tests(test_files, process_number, options)
-      device_id = @device_helper.device_for_process process_number
+      device_id = @device_helper.device_for_process(process_number).first
 
       appium_port = start_appium(process_number,device_id,options[:appium_cmd])
       @@appium_ports.push(appium_port)
@@ -128,7 +129,7 @@ module ParallelAppium
       exports + separator + cmd
     end
 
-    def exit_parallel_execution
+    def teardown_parallel_execution
       stop_all_appium(@@appium_ports)
     end
   end
