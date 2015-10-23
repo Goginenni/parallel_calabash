@@ -25,7 +25,7 @@ module ParallelAppium
       raise "\n**** NO DEVICE FOUND ****\n" if number_of_processes==0
       puts '*******************************'
       puts " #{number_of_processes} DEVICES FOUND:"
-      puts @helper.connected_devices_with_model_info
+      @helper.connected_devices_with_model_info.each { |p| print "#{p}\n" }
       puts '*******************************'
       number_of_processes
     end

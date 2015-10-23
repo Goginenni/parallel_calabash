@@ -100,6 +100,10 @@ module ParallelAppium
       # Android is fairly sane....
     end
 
+    def teardown_for_parallel_execution
+      # Android is fairly sane....
+    end
+
 
     def run_tests(test_files, process_number, options)
       device_id = @device_helper.device_for_process(process_number).first
@@ -222,7 +226,7 @@ module ParallelAppium
       simulator.match('\d+-\d+$').to_s.gsub('-', '.')
     end
 
-    def prepare_for_parallel_execution
+    def setup_for_parallel_execution
       # copy-chown all the files, and set everything group-writable.
       Find.find('.') do |path|
         if File.file?(path) && !File.stat(path).owned?
@@ -232,9 +236,22 @@ module ParallelAppium
           puts "Chowned/copied.... #{path}"
         end
       end
-      FileUtils.chmod_R('g+w', 'build/reports') if File.exists? 'build/reports'
-      FileUtils.chmod('g+w', Dir['*'])
-      FileUtils.chmod('g+w', '.')
+      FileUtils.chmod_R('g=u', 'build/reports') if File.exist?('build/reports')
+      FileUtils.chmod('g=u', Dir['*'])
+      FileUtils.chmod('g=u', '.')
+
+      # Kill all simulators
+      kill_all = @device_helper.xcode7? ? 'killall Simulator' :  "killall 'iOS Simulator'"
+      @device_helper.connected_devices_with_model_info.each { |device|
+        ssh = device[:USER] ? "ssh #{device[:USER]}@localhost" : 'bash -c'
+        # Kill all the simulators!
+        puts 'Killall: ' + %x( #{ssh} "#{kill_all}" )
+      }
+    end
+
+    def teardown_for_parallel_execution
+      # Strangely, identical to set up!
+      setup_for_parallel_execution
     end
 
     def create_simulator(device_name, ssh, simulator)
@@ -244,7 +261,7 @@ module ParallelAppium
       puts "OK if none"
 
       device_info = %x( #{ssh} "xcrun simctl create #{device_name} #{simulator}" ).strip
-      fail "Failed to create #{device_name} for #{ssh}" unless device_info
+      fail "Failed to create #{device_name} for #{ssh}" if device_info.nil? || device_info.empty?
       device_info
     end
 
@@ -258,6 +275,7 @@ module ParallelAppium
       end
     end
 
+    # Ideally should be copied by the user, but gid access should suffice.
     def copy_app_set_port(app_path, device)
       user_path = File.dirname(app_path) + '/' + device[:USER]
       FileUtils.rmtree(user_path)
@@ -271,6 +289,8 @@ module ParallelAppium
       unless system("/usr/libexec/PlistBuddy -c 'Add CalabashServerPort integer #{device[:CALABASH_SERVER_PORT]}' #{user_app}/Info.plist")
         raise "Unable to set CalabashServerPort in #{user_app}/Info.plist"
       end
+
+      FileUtils.chmod_R('g=u', user_app)
 
       puts "User app: #{user_app}"
 
