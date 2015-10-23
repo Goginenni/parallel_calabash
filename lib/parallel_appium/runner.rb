@@ -15,7 +15,7 @@ module ParallelAppium
       appium_port = 4723 + process_number + 1
       cmd = appium_cmd || 'appium'
 
-      start_appium = "#{cmd} --port #{appium_port} --udid #{device_id} --bootstrap-port #{bootstrap_port} --chromedriver-port #{chrome_driver_port} --log-level error --log appium_#{process_number}.log &"
+      start_appium = "#{cmd} --port #{appium_port} --udid #{device_id} --bootstrap-port #{bootstrap_port} --chromedriver-port #{chrome_driver_port} --log appium_#{process_number}.log &"
 
       $stdout.print "appium command: #{start_appium}"
       system(start_appium)
@@ -35,7 +35,7 @@ module ParallelAppium
       end
 
       puts '*******************************'
-      puts " APPIUM started on port : #{appium_port}"
+      puts " APPIUM started on port : #{appium_port} on device: #{device_id}"
       puts '*******************************'
 
       appium_port
